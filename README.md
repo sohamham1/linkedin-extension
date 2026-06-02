@@ -101,7 +101,7 @@ In some cases, the pill may also show lightweight company context to make scanni
 - currently English-first
 - depends on LinkedIn's DOM and UI structure, which can change
 - heuristic classification can still be wrong on edge cases
-- some `Maybe` posts will still require human judgment
+- `Maybe` posts will still require human judgment
 
 ## For developers
 
