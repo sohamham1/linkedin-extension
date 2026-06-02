@@ -3,6 +3,7 @@
   const { hashString, normalizeText } = NS.utils;
   const INSTANCE_KEY = "__linkedinHiringDetectorInstance";
   const DEBUG_KEY = "LinkedInHiringExtensionDebug";
+  const DEBUG_CONSOLE_STORAGE_KEY = "lihpd:debug-console";
   const LOG_PREFIX = "[LIHPD]";
   const PROCESS_LIMIT = 250;
   const PROCESS_WINDOW_MS = 15000;
@@ -66,7 +67,13 @@
       debugState.counters.circuitBreaker += 1;
     }
 
-    console.warn(LOG_PREFIX, type, details || "");
+    try {
+      if (window.localStorage && window.localStorage.getItem(DEBUG_CONSOLE_STORAGE_KEY) === "1") {
+        console.warn(LOG_PREFIX, type, details || "");
+      }
+    } catch (error) {
+      // Ignore localStorage access issues and keep the extension quiet by default.
+    }
   }
 
   function isSupportedRoute(urlLike) {

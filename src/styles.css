@@ -6,21 +6,21 @@
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 8px;
-  min-width: 96px;
-  padding: 7px 12px;
-  max-width: min(260px, calc(100% - 140px));
+  gap: 6px;
+  min-width: 84px;
+  padding: 6px 10px;
+  max-width: min(220px, calc(100% - 140px));
   border: 1px solid rgba(15, 23, 42, 0.12);
   border-radius: 999px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 247, 251, 0.82));
   color: #0f172a;
   backdrop-filter: blur(18px) saturate(160%);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
-  font: 600 12px/1 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+  font: 600 11px/1 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
   letter-spacing: -0.01em;
   pointer-events: none;
   box-shadow:
-    0 12px 28px rgba(15, 23, 42, 0.14),
+    0 4px 12px rgba(15, 23, 42, 0.07),
     inset 0 1px 0 rgba(255, 255, 255, 0.7);
   transition:
     transform 180ms ease,
@@ -30,9 +30,9 @@
 }
 
 .lihpd-badge.has-meta {
-  min-width: 132px;
-  padding-right: 14px;
-  max-width: min(300px, calc(100% - 160px));
+  min-width: 116px;
+  padding-right: 12px;
+  max-width: min(250px, calc(100% - 160px));
 }
 
 .lihpd-badge::before {
@@ -66,20 +66,34 @@
 
 .lihpd-badge.is-none {
   background: linear-gradient(180deg, rgba(247, 249, 252, 0.98), rgba(228, 232, 238, 0.88));
-  color: #344054;
-  border-color: rgba(52, 64, 84, 0.2);
+  color: #475467;
+  border-color: rgba(127, 29, 29, 0.16);
   box-shadow:
-    0 14px 32px rgba(15, 23, 42, 0.11),
+    0 4px 12px rgba(15, 23, 42, 0.07),
     inset 0 1px 0 rgba(255, 255, 255, 0.76);
+  overflow: hidden;
+}
+
+.lihpd-badge.is-none::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(90deg, rgba(220, 38, 38, 0.34), rgba(220, 38, 38, 0.04) 34%, rgba(255, 255, 255, 0) 70%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .lihpd-badge.is-none::before {
   width: 8px;
   height: 8px;
-  background: #344054;
-  box-shadow:
-    0 0 0 3px rgba(255, 255, 255, 0.42),
-    0 0 0 6px rgba(52, 64, 84, 0.08);
+  background: #b91c1c;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.42);
 }
 
 .lihpd-badge.is-scanning {
@@ -103,10 +117,10 @@
 
 .lihpd-badge__meta {
   display: none;
-  max-width: 160px;
+  max-width: 130px;
   overflow: hidden;
   color: rgba(15, 23, 42, 0.68);
-  font: 500 11px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  font: 500 10px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -132,11 +146,11 @@
 html[data-lihpd-page="detail"] .lihpd-badge {
   top: 8px;
   right: 138px;
-  max-width: min(320px, calc(100% - 220px));
+  max-width: min(260px, calc(100% - 220px));
 }
 
 html[data-lihpd-page="detail"] .lihpd-badge.has-meta {
-  max-width: min(340px, calc(100% - 230px));
+  max-width: min(280px, calc(100% - 230px));
 }
 
 .lihpd-status {

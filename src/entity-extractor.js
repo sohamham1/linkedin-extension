@@ -6,13 +6,14 @@
     /\b(?:role|position|opening|job)\s*:\s*([a-z][a-z0-9/&,+()' -]{1,80})/i,
     /\bhiring\s*:?\s*([a-z][a-z0-9/&,+()' -]{1,80})\s+(?:at|for)\s+([a-z][a-z0-9&.,' -]{1,80})/i,
     /\blooking for\s+(?:an?|the)\s+([a-z][a-z0-9/&,+()' -]{1,80})/i,
-    /\b(?:we(?:'re| are)? hiring|actively hiring)\s+(?:an?|for)?\s*([a-z][a-z0-9/&,+()' -]{1,80})/i,
+    /\b(?:we(?:'re| are)? hiring|actively hiring)\s+(?:an?|for)?\s*([a-z][a-z0-9/&,+()' -]{1,80}?)(?=\.|,|;|\bat\b|\bto join\b|\bto work\b|\bremote\b|$)/i,
     /\bjoin us as\s+(?:an?|the)\s+([a-z][a-z0-9/&,+()' -]{1,80})/i
   ];
 
   const COMPANY_PATTERNS = [
     /\bcompany\s*:\s*([a-z][a-z0-9&.,' -]{1,80}?)(?=\.|,|;|\brole\b|\brequirements\b|$)/i,
-    /\b([A-Z][A-Za-z0-9&.,' -]{1,80})\s+is hiring\b/
+    /\b([A-Z][A-Za-z0-9&.,' -]{1,80})\s+is hiring\b/,
+    /\bjoin us at\s+([A-Z][A-Za-z0-9&.,' -]{1,80}?)(?=\.|,|;|\bin\b\s+[A-Z][A-Za-z]+|$)/
   ];
 
   const RECRUITER_SIGNALS = [
@@ -40,6 +41,8 @@
 
   function normalizeRole(value) {
     const cleaned = cleanCandidate(value)
+      .replace(/^(?:an?|the)\s+/i, "")
+      .replace(/\bto join us(?:\s+(?:at|for)\s+[A-Z][A-Za-z0-9&.,' -]{1,80})?$/i, "")
       .replace(/\b(?:in|at|for)\s+[A-Z][A-Za-z0-9&.,' -]{1,80}$/, "")
       .replace(/\b(?:remote|india|bangalore|bengaluru|mumbai|hyderabad|pune)\b/gi, "")
       .replace(/\s{2,}/g, " ")
@@ -100,7 +103,7 @@
       return linkedCompany;
     }
 
-    const hiringRoleMatch = text.match(/\bhiring\s*:?\s*([a-z][a-z0-9/&,+()' -]{1,80})\s+(?:at|for)\s+([a-z][a-z0-9&.,' -]{1,80}?)(?=\.|,|;|$)/i);
+    const hiringRoleMatch = text.match(/\bhiring\s*:?\s*([a-z][a-z0-9/&,+()' -]{1,80})\s+(?:at|for)\s+([a-z][a-z0-9&.,' -]{1,80}?)(?=\.|,|;|\bin\b\s+[A-Z][A-Za-z]+|$)/i);
     if (hiringRoleMatch) {
       return normalizeCompany(hiringRoleMatch[2]);
     }

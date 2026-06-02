@@ -29,18 +29,26 @@
     return hashString(`${author}|${time}|${snippet}`);
   }
 
+  function normalizeStructuredText(input) {
+    return String(input || "")
+      .split(/\r?\n/)
+      .map((line) => compactWhitespace(line))
+      .filter(Boolean)
+      .join("\n");
+  }
+
   function extractVisibleText(postElement) {
     const joined = TEXT_SELECTORS
       .flatMap((selector) => Array.from(postElement.querySelectorAll(selector)))
-      .map((node) => visibleText(node))
+      .map((node) => normalizeStructuredText(node.innerText || node.textContent || ""))
       .filter(Boolean)
-      .join("\n");
+      .join("\n\n");
 
     if (joined.trim()) {
-      return compactWhitespace(joined);
+      return joined.trim();
     }
 
-    return compactWhitespace(visibleText(postElement));
+    return normalizeStructuredText(postElement.innerText || postElement.textContent || "");
   }
 
   function isTruncated(postElement) {

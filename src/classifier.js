@@ -2,17 +2,90 @@
   const NS = window.LinkedInHiringExtension;
   const { normalizeText, extractUrls, extractEmails } = NS.utils;
 
+  const ROLE_TITLE_SIGNALS = [
+    "accountant", "accounts executive", "accounts manager", "actuary", "ad operations manager",
+    "ad sales manager", "admissions counselor", "admissions manager", "aerospace engineer", "agile coach",
+    "android developer", "animator", "applied scientist", "architect", "art director",
+    "art producer", "associate consultant", "associate editor", "associate product manager", "associate producer",
+    "associate scientist", "auditor", "automation engineer", "backend developer", "backend engineer",
+    "banker", "bi analyst", "bi developer", "big data engineer", "billing specialist",
+    "bioinformatician", "biologist", "biomedical engineer", "brand designer", "brand manager",
+    "business analyst", "business consultant", "business development executive", "business development manager", "business intelligence analyst",
+    "business intelligence developer", "campaign manager", "cardiologist", "care coordinator", "care manager",
+    "care navigator", "care specialist", "case manager", "category manager", "chemical engineer",
+    "chief of staff", "civil engineer", "claims analyst", "clinical data manager", "clinical operations manager",
+    "clinical pharmacist", "clinical psychologist", "clinical researcher", "clinical research associate", "cloud architect",
+    "cloud engineer", "comms manager", "community manager", "compliance analyst", "compliance manager",
+    "concept artist", "content creator", "content designer", "content editor", "content manager",
+    "content marketer", "content producer", "content specialist", "copy editor", "copywriter",
+    "corporate banker", "credit analyst", "creative director", "creative manager", "crm manager",
+    "customer success associate", "customer success manager", "customer support engineer", "customer support specialist", "cybersecurity analyst",
+    "cybersecurity engineer", "data analyst", "data architect", "data engineer", "data governance analyst",
+    "data governance manager", "data scientist", "database administrator", "delivery manager", "demand generation manager",
+    "dentist", "dermatologist", "design engineer", "design manager", "devops engineer",
+    "digital marketing manager", "digital strategist", "director of engineering", "director of product", "doctor",
+    "ecommerce manager", "editor", "editorial assistant", "editorial manager", "electrical engineer",
+    "embedded engineer", "embedded software engineer", "environment artist", "environmental engineer", "epidemiologist",
+    "er nurse", "event manager", "executive assistant", "facility manager", "finance analyst",
+    "finance manager", "financial advisor", "financial analyst", "financial controller", "financial planner",
+    "financial writer", "firmware engineer", "founding designer", "founding engineer", "founding pm",
+    "frontend developer", "frontend engineer", "full stack developer", "full stack engineer", "game designer",
+    "game developer", "game economy designer", "game producer", "game programmer", "game writer",
+    "gameplay designer", "gameplay engineer", "general manager", "general physician", "genomics analyst",
+    "graphic designer", "group creative manager", "growth analyst", "growth associate", "growth lead",
+    "growth manager", "hardware engineer", "head of content", "head of design", "head of growth",
+    "head of marketing", "head of partnerships", "head of product", "head of sales", "hr business partner",
+    "hr generalist", "hr manager", "illustrator", "industrial designer", "inside sales representative",
+    "instructional designer", "insurance advisor", "insurance underwriter", "integrated marketing manager", "interaction designer",
+    "ios developer", "ios engineer", "investment analyst", "investment banker", "investment associate",
+    "journalist", "laboratory technician", "legal associate", "legal counsel", "level designer",
+    "logistics manager", "machine learning engineer", "machine learning scientist", "management consultant", "managing editor",
+    "manufacturing engineer", "market research analyst", "marketing analyst", "marketing associate", "marketing coordinator",
+    "marketing lead", "marketing manager", "media buyer", "media planner", "medical advisor",
+    "medical assistant", "medical coder", "medical director", "medical officer", "medical representative",
+    "medical science liaison", "medical writer", "merchandiser", "ml engineer", "mobile developer",
+    "mobile engineer", "motion designer", "motion graphics designer", "narrative designer", "network engineer",
+    "nurse", "nurse practitioner", "occupational therapist", "oncologist", "operations analyst",
+    "operations associate", "operations executive", "operations manager", "orthopedic surgeon", "partnerships manager",
+    "pathologist", "patient coordinator", "patient counselor", "patient success manager", "performance marketer",
+    "pharmacist", "photographer", "physician", "pipeline td", "planner",
+    "portfolio manager", "pricing analyst", "principal engineer", "principal product manager", "producer",
+    "product analyst", "product designer", "product lead", "product manager", "product marketing manager",
+    "product owner", "product strategist", "program manager", "project coordinator", "project manager",
+    "prompt engineer", "psychiatrist", "psychologist", "publisher", "publishing editor",
+    "qa analyst", "qa engineer", "quality assurance engineer", "quant analyst", "quant researcher",
+    "radiologist", "react developer", "react native developer", "recruiter", "research analyst",
+    "research assistant", "research associate", "research scientist", "revenue operations manager", "risk analyst",
+    "risk manager", "sales associate", "sales development representative", "sales executive", "sales manager",
+    "sales operations analyst", "sales operations manager", "scrum master", "security analyst", "security engineer",
+    "seo manager", "seo specialist", "site reliability engineer", "social media manager", "social media strategist",
+    "software architect", "software developer", "software development engineer", "software engineer", "solutions architect",
+    "solutions consultant", "solutions engineer", "sound designer", "speech therapist", "sports medicine doctor",
+    "staff accountant", "staff engineer", "strategy analyst", "strategy manager", "studio manager",
+    "supply chain analyst", "supply chain manager", "surgeon", "systems analyst", "systems engineer",
+    "talent acquisition partner", "talent acquisition specialist", "technical artist", "technical consultant", "technical lead",
+    "technical product manager", "technical program manager", "technical recruiter", "technical support engineer", "technical writer",
+    "test engineer", "trader", "treasury analyst", "ui designer", "ui engineer",
+    "underwriter", "unity developer", "unity engineer", "unreal developer", "unreal engineer",
+    "ux designer", "ux researcher", "vfx artist", "video editor", "video producer",
+    "visual designer", "web designer", "web developer", "writer", "xray technician",
+    "intern", "internship", "summer intern", "winter intern", "management trainee",
+    "graduate engineer trainee", "trainee engineer", "analyst intern", "developer intern", "engineering intern",
+    "software engineer intern", "backend engineer intern", "frontend engineer intern", "full stack intern", "product intern",
+    "product management intern", "product design intern", "ux intern", "ui ux intern", "design intern",
+    "graphic design intern", "marketing intern", "content intern", "finance intern", "investment banking intern",
+    "research intern", "data analyst intern", "data science intern", "machine learning intern", "qa intern",
+    "hr intern", "operations intern", "sales intern", "business analyst intern", "editorial intern",
+    "media intern", "game design intern", "gameplay programmer intern", "medical intern", "clinical intern"
+  ];
+
   const PHRASE_GROUPS = {
     hiringStrong: [
       "we're hiring", "we are hiring", "hiring now", "join our team",
       "open role", "open roles", "job opening", "vacancy", "hiring for", "immediate opening",
       "urgent hiring", "actively hiring", "#hiring", "#hiringnow", "open positions"
     ],
-    roleTitles: [
-      "engineer", "developer", "designer", "analyst", "product manager", "intern",
-      "sales", "marketing", "recruiter", "data scientist", "frontend", "backend",
-      "full stack", "software", "qa", "devops", "android", "ios", "founding engineer"
-    ],
+    roleTitles: ROLE_TITLE_SIGNALS,
     applySignals: [
       "apply", "apply here", "apply now", "job description", "jd", "resume", "cv",
       "send your profile", "dm me", "drop your resume", "email me", "careers page",
@@ -78,6 +151,12 @@
       "custom commission", "waitlist", "limited number of clients", "legacy collection",
       "fashion week", "fine jewelry", "brand from the ground up", "our answer to an industry",
       "wedding band", "clients at a time", "wearable monument"
+    ],
+    endorsementSignals: [
+      "had the privilege of having", "what i took away", "giving back to the community",
+      "monthly ama", "reach out to him or his company", "recommend i speak to",
+      "if you ever get a chance to work with him", "mentorship on adplist",
+      "do tag them", "share their name"
     ]
   };
 
@@ -113,6 +192,37 @@
     return /\blooking for\s+(?:strong\s+|passionate\s+|experienced\s+|talented\s+|driven\s+|ambitious\s+)?(?:engineers?|developers?|designers?|analysts?|product thinkers?|product managers?|interns?|marketers?|recruiters?|salespeople|sales leaders|founding engineers?|candidates|talent|folks|people)\b/i.test(text);
   }
 
+  function hasInlineHiringRole(text) {
+    return /\b(?:we(?:'re| are)? hiring|hiring)\s+(?:an?|for)?\s*[a-z][a-z0-9/&,+()' -]{2,80}\b/i.test(text);
+  }
+
+  function hasExperienceRequirement(text) {
+    return /\b\d+\s*[-–]\s*\d+\s+years?\s+of\s+experience\b/i.test(text)
+      || /\b\d+\+?\s+years?\s+of\s+experience\b/i.test(text);
+  }
+
+  function hasTitleLead(rawText) {
+    const firstLine = String(rawText || "")
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .find(Boolean);
+
+    if (!firstLine || firstLine.length > 90) {
+      return false;
+    }
+
+    const normalizedFirstLine = normalizeText(firstLine);
+    return phraseHits(normalizedFirstLine, ROLE_TITLE_SIGNALS).length > 0
+      && /\b[a-z][a-z0-9.+/& -]*(?:\([^)]{2,40}\))?\s*$/i.test(firstLine);
+  }
+
+  function hasStructuredJobDescription(rawText, text) {
+    const headingPattern = /\b(?:what you'll work on|what you will work on|what you'll do|what you will do|what we care about|you'll probably enjoy this if|you will probably enjoy this if|about us|about the role|responsibilities|requirements|who you are)\b/gi;
+    const headings = text.match(headingPattern) || [];
+    const bulletLines = String(rawText || "").match(/^\s*[-*•]\s+\S+/gm) || [];
+    return headings.length >= 2 && bulletLines.length >= 3;
+  }
+
   function scoreText(rawText) {
     const text = normalizeText(rawText);
     const urls = extractUrls(rawText);
@@ -131,7 +241,8 @@
       opinionSignals: phraseHits(text, PHRASE_GROUPS.opinionSignals),
       adviceSignals: phraseHits(text, PHRASE_GROUPS.adviceSignals),
       consultingSignals: phraseHits(text, PHRASE_GROUPS.consultingSignals),
-      commercialSignals: phraseHits(text, PHRASE_GROUPS.commercialSignals)
+      commercialSignals: phraseHits(text, PHRASE_GROUPS.commercialSignals),
+      endorsementSignals: phraseHits(text, PHRASE_GROUPS.endorsementSignals)
     };
 
     let hiringScore = 0;
@@ -153,6 +264,7 @@
     negativeScore += hits.adviceSignals.length * 5;
     negativeScore += hits.consultingSignals.length * 6;
     negativeScore += hits.commercialSignals.length * 5;
+    negativeScore += hits.endorsementSignals.length * 5;
 
     const hiringLookingForContext = hasHiringLookingForContext(text);
     if (hiringLookingForContext) {
@@ -177,8 +289,19 @@
     }
     const explicitHiringAnnouncement = hasExplicitHiringAnnouncement(text);
     const structuredRoleBlock = hasStructuredRoleBlock(text);
+    const inlineHiringRole = hasInlineHiringRole(text);
+    const experienceRequirement = hasExperienceRequirement(text);
+    const titleLead = hasTitleLead(rawText);
+    const structuredJobDescription = hasStructuredJobDescription(rawText, text);
     if (hits.hiringStrong.length > 0 && (urls.length > 0 || emails.length > 0)) {
       actionabilityScore += 4;
+    }
+    if (inlineHiringRole) {
+      hiringScore += 4;
+    }
+    if (experienceRequirement) {
+      hiringScore += 3;
+      actionabilityScore += 2;
     }
     if (explicitHiringAnnouncement && hits.growthSignals.length > 0) {
       hiringScore += 5;
@@ -195,6 +318,10 @@
     if (explicitHiringAnnouncement && structuredRoleBlock && hits.roleTitles.length > 0) {
       hiringScore += 4;
       actionabilityScore += 3;
+    }
+    if (titleLead && structuredJobDescription && hits.roleTitles.length > 0) {
+      hiringScore += 8;
+      actionabilityScore += 5;
     }
 
     const isLikelySelfSeeking = hits.selfSeekingSignals.length > 0;
@@ -233,6 +360,18 @@
     }
     if (hiringLookingForContext) {
       reasons.push("signal:hiring-looking-for-context");
+    }
+    if (inlineHiringRole) {
+      reasons.push("signal:inline-hiring-role");
+    }
+    if (experienceRequirement) {
+      reasons.push("signal:experience-requirement");
+    }
+    if (titleLead) {
+      reasons.push("signal:title-lead");
+    }
+    if (structuredJobDescription) {
+      reasons.push("signal:structured-job-description");
     }
 
     let label = NS.constants.badgeStates.NONE;
