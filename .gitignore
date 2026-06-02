@@ -11,3 +11,6 @@ desktop.ini
 *.njsproj
 *.sln
 *.sw?
+
+# Project-specific ignores
+design/

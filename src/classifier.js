@@ -4,9 +4,9 @@
 
   const PHRASE_GROUPS = {
     hiringStrong: [
-      "we're hiring", "we are hiring", "hiring now", "join our team", "looking for",
+      "we're hiring", "we are hiring", "hiring now", "join our team",
       "open role", "open roles", "job opening", "vacancy", "hiring for", "immediate opening",
-      "urgent hiring", "actively hiring", "#hiring", "#hiringnow"
+      "urgent hiring", "actively hiring", "#hiring", "#hiringnow", "open positions"
     ],
     roleTitles: [
       "engineer", "developer", "designer", "analyst", "product manager", "intern",
@@ -21,7 +21,8 @@
     ],
     growthSignals: [
       "team is growing", "building our team", "we are growing", "expanding our team",
-      "hiring across", "multiple openings", "new opening"
+      "hiring across", "multiple openings", "new opening", "across all levels",
+      "come build with us", "find your place"
     ],
     actionabilityStrong: [
       "accepting applications", "open until", "currently hiring", "still hiring",
@@ -72,6 +73,11 @@
       "i will tear down your job description", "shortlist in 45 minutes",
       "5 founders only", "founder still does not have", "the title was the trap",
       "hire 1 should have been", "title is boring. output is real"
+    ],
+    commercialSignals: [
+      "custom commission", "waitlist", "limited number of clients", "legacy collection",
+      "fashion week", "fine jewelry", "brand from the ground up", "our answer to an industry",
+      "wedding band", "clients at a time", "wearable monument"
     ]
   };
 
@@ -103,6 +109,10 @@
     return phraseMatches(text, "company:") || phraseMatches(text, "role:");
   }
 
+  function hasHiringLookingForContext(text) {
+    return /\blooking for\s+(?:strong\s+|passionate\s+|experienced\s+|talented\s+|driven\s+|ambitious\s+)?(?:engineers?|developers?|designers?|analysts?|product thinkers?|product managers?|interns?|marketers?|recruiters?|salespeople|sales leaders|founding engineers?|candidates|talent|folks|people)\b/i.test(text);
+  }
+
   function scoreText(rawText) {
     const text = normalizeText(rawText);
     const urls = extractUrls(rawText);
@@ -120,7 +130,8 @@
       personalAnnouncementSignals: phraseHits(text, PHRASE_GROUPS.personalAnnouncementSignals),
       opinionSignals: phraseHits(text, PHRASE_GROUPS.opinionSignals),
       adviceSignals: phraseHits(text, PHRASE_GROUPS.adviceSignals),
-      consultingSignals: phraseHits(text, PHRASE_GROUPS.consultingSignals)
+      consultingSignals: phraseHits(text, PHRASE_GROUPS.consultingSignals),
+      commercialSignals: phraseHits(text, PHRASE_GROUPS.commercialSignals)
     };
 
     let hiringScore = 0;
@@ -141,6 +152,12 @@
     negativeScore += hits.opinionSignals.length * 5;
     negativeScore += hits.adviceSignals.length * 5;
     negativeScore += hits.consultingSignals.length * 6;
+    negativeScore += hits.commercialSignals.length * 5;
+
+    const hiringLookingForContext = hasHiringLookingForContext(text);
+    if (hiringLookingForContext) {
+      hiringScore += 4;
+    }
 
     if (urls.length > 0) {
       hiringScore += 2;
@@ -158,12 +175,19 @@
       hiringScore += 4;
       actionabilityScore += 3;
     }
+    const explicitHiringAnnouncement = hasExplicitHiringAnnouncement(text);
+    const structuredRoleBlock = hasStructuredRoleBlock(text);
     if (hits.hiringStrong.length > 0 && (urls.length > 0 || emails.length > 0)) {
       actionabilityScore += 4;
     }
-
-    const explicitHiringAnnouncement = hasExplicitHiringAnnouncement(text);
-    const structuredRoleBlock = hasStructuredRoleBlock(text);
+    if (explicitHiringAnnouncement && hits.growthSignals.length > 0) {
+      hiringScore += 5;
+      actionabilityScore += 2;
+    }
+    if (explicitHiringAnnouncement && urls.length > 0) {
+      hiringScore += 3;
+      actionabilityScore += 2;
+    }
     if (explicitHiringAnnouncement) {
       hiringScore += 6;
       actionabilityScore += 3;
@@ -206,6 +230,9 @@
     }
     if (structuredRoleBlock) {
       reasons.push("signal:structured-role-block");
+    }
+    if (hiringLookingForContext) {
+      reasons.push("signal:hiring-looking-for-context");
     }
 
     let label = NS.constants.badgeStates.NONE;

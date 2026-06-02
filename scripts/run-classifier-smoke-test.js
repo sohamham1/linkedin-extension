@@ -107,6 +107,16 @@ const fixtures = [
     name: "Public sector hiring post with deadline",
     expected: "Open",
     text: "#HiringNow Take pride in energizing the nation with Bharat Petroleum Corporation Limited. Refer the attached file and the interested candidates can apply via the following link: https://lnkd.in/dgQtejEm. If you are an ambitious, qualified and versatile professional, we are looking for you. Last date for submission of application is 20.06.2026."
+  },
+  {
+    name: "Broad multi-role hiring announcement",
+    expected: "Open",
+    text: "We are hiring. Not for everyone - we move fast, hold a high bar, and expect real ownership. If that's your kind of place, come build with us. From programs, fundraising, people & culture to finance, we have open positions across all levels, from interns to CXO, across Bangalore, Meghalaya, Tripura, Jharkhand, Seattle, Texas, Assam, Odisha. Find your place to make an impact: https://lnkd.in/gEqRJZpv The/Nudge Institute"
+  },
+  {
+    name: "Founder story and product pitch",
+    expected: "No Opening",
+    text: "How did I go from a 9-to-5 employee to a CEO? Eight years ago, I arrived in the US with a clear path: Study hard. Get a good job. Chase the American dream. I did just that. I spent five years in consulting. But a question remained: What if I built something entirely mine? The answer came on my wedding day. Looking for a wedding band, I couldn't find a single piece that felt like me. The jewelry industry crafts breathtaking, intentional pieces for women. But for a man? You settle for a plain, mass-produced band. That never sat right with me. So my wife, Nika, left her career as a software engineer to build a fine jewelry brand from the ground up with me. When I put my custom-made wedding band on, it clicked: I am meant to revolutionize men's fine jewelry. That moment became AviNika. Our Legacy Collection is our answer to an industry that overlooked men. We choose to work with a limited number of clients at a time. If your legacy deserves more than a shelf piece, you may join the custom commission waitlist at: www.avinikajewelry.com"
   }
 ];
 
