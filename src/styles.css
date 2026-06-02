@@ -1,0 +1,161 @@
+.lihpd-badge {
+  position: absolute;
+  top: 6px;
+  right: 82px;
+  z-index: 2147483647;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-width: 96px;
+  padding: 7px 12px;
+  max-width: min(260px, calc(100% - 140px));
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 247, 251, 0.82));
+  color: #0f172a;
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  font: 600 12px/1 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+  letter-spacing: -0.01em;
+  pointer-events: none;
+  box-shadow:
+    0 12px 28px rgba(15, 23, 42, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.lihpd-badge.has-meta {
+  min-width: 132px;
+  padding-right: 14px;
+  max-width: min(300px, calc(100% - 160px));
+}
+
+.lihpd-badge::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  align-self: center;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45);
+}
+
+.lihpd-badge.is-open {
+  background: linear-gradient(180deg, rgba(240, 253, 244, 0.94), rgba(220, 252, 231, 0.82));
+  color: #166534;
+  border-color: rgba(22, 101, 52, 0.16);
+}
+
+.lihpd-badge.is-closed {
+  background: linear-gradient(180deg, rgba(254, 242, 242, 0.94), rgba(254, 226, 226, 0.82));
+  color: #b42318;
+  border-color: rgba(180, 35, 24, 0.16);
+}
+
+.lihpd-badge.is-maybe {
+  background: linear-gradient(180deg, rgba(255, 251, 235, 0.96), rgba(254, 243, 199, 0.84));
+  color: #b54708;
+  border-color: rgba(181, 71, 8, 0.16);
+}
+
+.lihpd-badge.is-none {
+  background: linear-gradient(180deg, rgba(247, 249, 252, 0.98), rgba(228, 232, 238, 0.88));
+  color: #344054;
+  border-color: rgba(52, 64, 84, 0.2);
+  box-shadow:
+    0 14px 32px rgba(15, 23, 42, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.76);
+}
+
+.lihpd-badge.is-none::before {
+  width: 8px;
+  height: 8px;
+  background: #344054;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.42),
+    0 0 0 6px rgba(52, 64, 84, 0.08);
+}
+
+.lihpd-badge.is-scanning {
+  background: linear-gradient(180deg, rgba(239, 248, 255, 0.94), rgba(219, 234, 254, 0.82));
+  color: #175cd3;
+  border-color: rgba(23, 92, 211, 0.16);
+}
+
+.lihpd-badge__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lihpd-badge__text {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.lihpd-badge__meta {
+  display: none;
+  max-width: 160px;
+  overflow: hidden;
+  color: rgba(15, 23, 42, 0.68);
+  font: 500 11px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lihpd-badge.has-meta .lihpd-badge__label,
+.lihpd-badge.has-meta .lihpd-badge__meta {
+  display: block;
+}
+
+.lihpd-badge.has-meta .lihpd-badge__text {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.lihpd-badge.has-meta .lihpd-badge__meta::before {
+  content: "\00b7";
+  margin-right: 6px;
+  color: currentColor;
+  opacity: 0.5;
+}
+
+html[data-lihpd-page="detail"] .lihpd-badge {
+  top: 8px;
+  right: 138px;
+  max-width: min(320px, calc(100% - 220px));
+}
+
+html[data-lihpd-page="detail"] .lihpd-badge.has-meta {
+  max-width: min(340px, calc(100% - 230px));
+}
+
+.lihpd-status {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2147483647;
+  max-width: 240px;
+  padding: 12px 14px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(243, 244, 246, 0.84));
+  color: #111827;
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  font: 600 12px/1.35 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  letter-spacing: -0.01em;
+  box-shadow:
+    0 16px 36px rgba(17, 24, 39, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}

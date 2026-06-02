@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "LinkedIn Hiring Post Detector",
+  "version": "0.1.0",
+  "description": "Locally labels LinkedIn feed posts as Open, Closed/Filled, Maybe, or No opening.",
+  "host_permissions": [
+    "https://www.linkedin.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.linkedin.com/*"
+      ],
+      "js": [
+        "src/utils.js",
+        "src/classifier.js",
+        "src/entity-extractor.js",
+        "src/ui-overlay.js",
+        "src/text-resolver.js",
+        "src/feed-observer.js",
+        "src/content.js"
+      ],
+      "css": [
+        "src/styles.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
