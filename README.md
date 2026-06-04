@@ -70,16 +70,19 @@ Privacy is a core part of the product:
 
 This is not a SaaS tool watching your feed from somewhere else. The logic runs on your machine.
 
-## Install locally
+## Installation & Compatibility
 
-This project is currently set up as an unpacked Chrome extension.
+### Compatibility
+- **OS:** Works on **Windows, macOS, and Linux** (not restricted to Windows).
+- **Browser:** Officially supported on **Google Chrome** (and Chromium-based desktop browsers like Edge or Brave). **Not** supported on Firefox, Safari, or mobile browsers (since mobile Chrome does not support extensions).
 
-1. Download or clone this folder to your computer.
-2. Open `chrome://extensions`.
-3. Turn on `Developer mode`.
-4. Click `Load unpacked`.
-5. Select this project folder.
-6. Open [LinkedIn Feed](https://www.linkedin.com/feed/).
+### How to Install & Run
+1. Download or clone this repository to your computer.
+2. Open Google Chrome and go to `chrome://extensions/`.
+3. Turn on **Developer mode** (toggle in the top-right corner).
+4. Click **Load unpacked** (button in the top-left corner).
+5. Select this project folder (the folder containing `manifest.json`).
+6. Navigate to [LinkedIn](https://www.linkedin.com/feed/) to run the extension.
 
 ## How to use it
 
