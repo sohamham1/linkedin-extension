@@ -29,8 +29,9 @@ loadScript("src/classifier.js", context);
 loadScript("src/entity-extractor.js", context);
 loadScript("src/feed-observer.js", context);
 loadScript("src/text-resolver.js", context);
+loadScript("src/uncertain-post-fallback.js", context);
 
-const { classifier, entityExtractor, feedObserver, textResolver } = context.LinkedInHiringExtension;
+const { classifier, entityExtractor, feedObserver, textResolver, uncertainPostFallback } = context.LinkedInHiringExtension;
 
 const fixtures = [
   {
@@ -104,6 +105,31 @@ const fixtures = [
     text: "Excited to share that I am starting a new role as Senior Product Manager at Microsoft. Grateful for all the experiences, mentorship, friendships, and memories from this journey. Looking forward to this next chapter."
   },
   {
+    name: "Starting a new position announcement",
+    expected: "No Opening",
+    text: "I'm happy to share that I'm starting a new position as Director, Product at InCred Financial Services!"
+  },
+  {
+    name: "Looking-to-hire DM outreach post",
+    expected: "Open",
+    text: "We're looking to hire Category Managers (M/SM) at Zepto with 1-3 years of relevant work experience, preferably working with FMCG brands in Home & Personal Care categories. DM if you think this is relevant for you and we'll get in touch with you :)"
+  },
+  {
+    name: "Consulting AI case-study opinion post",
+    expected: "No Opening",
+    text: "A first-year analyst just did 2 days of work in 2 hours. So I asked the question nobody at the table wanted to answer: If a rookie with AI can do the work of a third-year... what exactly are we promoting people FOR? McKinsey's Lilli didn't just speed things up. The old pyramid was built on research being slow. Full breakdown of the case study here: https://lnkd.in/g4rnb55a What would you measure instead of hours? Curious how you'd score judgment."
+  },
+  {
+    name: "Buried storytelling hiring CTA post",
+    expected: "Maybe",
+    text: "Every great brand starts with someone willing to back an idea before the data does.\n\nA few years ago, I was meeting my tenth candidate for a marketing role that month.\n\nInterview after interview — CAC, retention, ROAS, funnels, cohorts.\n\nTechnically solid.\n\nEveryone knew the metrics.\n\nAnd after a while, every conversation started to sound the same.\n\nThen came a candidate who asked better questions than everyone else.\n\nWhy do customers order biryani more on Fridays?\n\nWhy does someone come back after their first order? And equally important, why don’t they?\n\nWhy does a family choose us for birthdays, celebrations and game nights?\n\nAt Rebel Foods, we’ve built brands that millions of people order out of love.\n\nWe’re looking for more of those people.\n\nIf brand building feels like a calling rather than a job, we’d love to meet you.\n\nWe’re not hiring marketers. We’re looking for future brand builders.\n\nCome build with us.\n\nApplication link in comments"
+  },
+  {
+    name: "Work anniversary apply again personal story",
+    expected: "No Opening",
+    text: "Another year at Zomato, another no Chat-Gpt Post. The highlight of my second year was finally getting into the CKAM team. This wouldn't have been possible without my previous manager pushing me to apply again, and making sure I don't give up until I make him proud. Always grateful and loyal to Zomato, Eternal."
+  },
+  {
     name: "Explicit company hiring announcement",
     expected: "Open",
     text: "Hiring: Product Manager at Nykaa. Nykaa is hiring passionate Product Managers to join their growing team and work on innovative digital products and customer experiences. Company: Nykaa. Role: Product Manager. Requirements: Product Thinking, User Research, Cross-Functional Collaboration, Problem-Solving Skills. If you're interested, comment interested below."
@@ -168,8 +194,53 @@ const fixtures = [
     name: "Structured title-first JD post",
     expected: "Open",
     text: "Backend Engineer (Node.js)\n\nWe're building technology to solve some of the hardest problems faced by Indian SMBs — from intelligent automation and business intelligence to customer experience, marketing, and operations.\n\nIf you get excited by building products that actually impact businesses, enjoy solving complex engineering challenges, and probably spend more time thinking about technology than your partner would like, we should talk.\n\nWhat you'll work on\n- Building scalable backend systems using Node.js\n- Designing APIs and automation engines\n- Working on AI-powered workflows, business intelligence, and customer engagement platforms\n- Solving real-world problems for thousands of businesses\n\nWhat we care about\nWe don't care much about fancy resumes, degrees, or how many buzzwords you can fit into your LinkedIn headline.\n\nWe only have 3 checks:\nVibe Match – You'll be working closely with a small, passionate team. We value curiosity, ownership, and people who enjoy building.\nTech Check – Can you solve problems? Can you write clean code? Can you learn fast? That's what matters.\nGood Human Check – Skills can be taught. Character is harder. We want genuinely good people.\n\nYou'll probably enjoy this if\n- You love backend engineering and system design\n- You're curious about AI, automation, and business intelligence\n- You like taking ownership instead of waiting for instructions\n- You enjoy building products from first principles\n- You want your work to directly shape a company's future\n\nAbout Us\nWe're a chill, product-first company building technology at the intersection of business intelligence, intelligent automation, customer experience, and AI.\n\nNo corporate politics.\nNo unnecessary meetings.\n\nJust smart people building ambitious things.\nIf this sounds like your kind of place, let's talk (but first check the product wisemelon)."
+  },
+  {
+    name: "Unicode hiring post with profile share CTA",
+    expected: "Open",
+    text: "We’re Hiring | Retention Marketing Executive 🚀\n\nAt BabyOrgano, we believe growth doesn’t stop at acquiring customers it’s about building relationships that last.\n\nWe’re looking for a Retention Marketing Executive who understands customer behavior, engagement, and how to turn first-time buyers into loyal brand advocates.\n\nIf you have experience in:\n• Email & WhatsApp Marketing\n• Customer engagement campaigns\n• CRM & retention strategies\n• Lifecycle marketing & automation\n• Improving repeat purchases & customer loyalty\nwe’d love to connect with you.\n\nWhat you’ll do:\n• Plan & execute retention campaigns across Email, WhatsApp, SMS & Push Notifications\n• Create personalized customer journeys & engagement flows\n• Analyze retention metrics, customer behavior & campaign performance\n• Work closely with marketing & creative teams for impactful communication\n• Build strategies to improve repeat purchase rates & customer loyalty\n\nWhat we’re looking for:\n• Creative + data-driven mindset\n• Understanding of customer psychology\n• Strong communication & analytical skills\n• Experience in D2C / E-commerce / Consumer Brands preferred\n\nLocation: Ahmedabad\nExperience: 2–4 Years\n\nShare your profile at: https://lnkd.in/dzTh55nc"
+  },
+  {
+    name: "Investment banking and consulting outreach hiring post",
+    expected: "Open",
+    text: "Hi, I’m looking to grow the advisory business of Akum Investment Strategy & Co after receiving 100s of startup requests.\n\nIf anyone is looking to join as an investment banking analyst/consultant for startups. Please reach out to akumsingh@akuminvestmentstrategy.com or DM."
+  },
+  {
+    name: "Open across founding team roles",
+    expected: "Open",
+    text: "Looking for smart, ambitious people who want to be part of a founding team and learn by building.\n\nOpen across:\n• Generalist\n• Design & Creative\n• Business Development\n• Supply Chain & Operations\n\nIf you’re excited by ownership, problem-solving, and growth, send your profile to neel@vmjewellery.com\n\nLocation : Mumbai"
+  },
+  {
+    name: "GTM and key accounts coverage",
+    expected: "Open",
+    text: "We’re hiring a GTM Associate and a Key Account Manager to help us scale distribution. Send your profile to careers@example.com."
+  },
+  {
+    name: "CEO office and climate coverage",
+    expected: "Open",
+    text: "Open roles: CEO's Office Associate and Climate Associate. If this sounds like you, email us at team@example.com."
+  },
+  {
+    name: "Deep ML systems hiring post with L-bands",
+    expected: "Open",
+    text: "YouTube’s Discovery ML Efficiency team is growing, and I’m looking for a few engineers to join us!\n\nWe’re a horizontal team working across all Discovery surface models (nomination, ranking, etc.). Our core mission is to make YouTube’s recommendation systems run faster and cheaper, while unblocking massive model scaling on the latest TPU hardware.\n\nWhy join this team?\n- High impact: Historically, our team has delivered double-digit YoY performance gains across our TPU footprint.\n- End-to-End Ownership: While we work closely with quality, infra, and data engineers, XLA compiler teams, and Google Research, our engineers actively modify the models we service, run experiments, and own launches across both training and serving.\n- A Unique Tech Stack: If you read most RecSys papers today, the focus is entirely on GPUs. We work exclusively on TPUs. This means we tackle a unique, highly specialized set of architectural and low-level challenges you won't encounter in a standard GPU environment.\n\nWe have two main areas we're hiring for right now:\n\nTech Lead for Modeling Efficiency (L6/L7) You’ll guide how our model architectures evolve alongside our hardware. You’ll bridge the gap between model quality engineers and our next-generation hardware evaluation teams to define what the future of RecSys looks like at YouTube scale. Ideally you have RecSys modeling experience and have enjoyed optimizing your launches.\nXLA / Low-Level TPU Developers (L3 to L6) Looking for folks who genuinely enjoy compilers, low-level optimization, and squeezing every bit of performance out of custom silicon. Ideally, you have GPU kernel experience or a background with GPU/XLA compilers.\n\nIf this sounds like a challenge you're up for, drop me (or Smit Hinsu) a DM or tag anyone in the comments who might be interested!\n\nI'll post links to the job posts in the comments below."
+  },
+  {
+    name: "Executive revenue leadership hiring post",
+    expected: "Open",
+    text: "We’re looking for someone to lead revenue at E2M.\n\nPosition could be: Head of Revenue OR Chief Revenue Officer\n\nThis role will own both sides of revenue growth:\n\nPre-sales: bringing in new customers and building a strong new business engine. (Does not include Marketing)\n\nPost-sales: growing revenue from existing customers through deeper relationships, expansion, and stronger client success.\n\nThis is an exciting opportunity for someone who wants to play a different game.\n\nE2M is growing fast. We are building a category-leading white label partner for digital agencies, and this role will play a key part in shaping the next phase of our growth.\n\nWe are looking for someone who understands the agency ecosystem, knows how digital agencies think, and has experience working with the US market.\n\nThis is not just a sales leadership role. It’s a chance to help build the revenue function of a high-growth company with strong momentum, a great team, and a very clear direction.\n\nP.S. Please do not apply if you do not have experience with the US market and have not worked in the digital agency ecosystem, especially in the white label space.\n\nIf this sounds like you, or someone you know, I’d love to connect."
   }
 ];
+
+function resolveFinalLabel(result, entities, text) {
+  if (entities.nativeCardType === "new-position") {
+    return "No Opening";
+  }
+  if (entities.nativeCardType === "job") {
+    return "Open";
+  }
+  return uncertainPostFallback.evaluate(text, result, entities).promotedLabel;
+}
 
 const results = fixtures.map((fixture) => {
   const result = classifier.scoreText(fixture.text);
@@ -181,7 +252,7 @@ const results = fixtures.map((fixture) => {
   return {
     name: fixture.name,
     expected: fixture.expected,
-    actual: result.label,
+    actual: resolveFinalLabel(result, entities, fixture.text),
     expectedCompanyName: fixture.expectedCompanyName || "",
     entities: {
       companyName: entities.companyName,
@@ -412,16 +483,11 @@ const styleChecks = [
   }
 ];
 
-const classifierSource = fs.readFileSync(path.join(workspaceRoot, "src/classifier.js"), "utf8");
-const roleTitleSignalsMatch = classifierSource.match(/const ROLE_TITLE_SIGNALS = \[([\s\S]*?)\];/);
-const roleTitleCount = roleTitleSignalsMatch
-  ? (roleTitleSignalsMatch[1].match(/"/g) || []).length / 2
-  : 0;
 const vocabularyChecks = [
   {
     name: "Role title coverage stays above 200 titles",
     expectedMinimum: 200,
-    actualCount: roleTitleCount
+    actualCount: classifier.roleTitleCount || 0
   }
 ];
 
@@ -436,6 +502,18 @@ const nativeJobEntities = entityExtractor.extract({
     return [];
   }
 }, "Calling ex-founders. We're hiring Entrepreneurs in Residence at Hobfit.");
+
+const startingPositionEntities = entityExtractor.extract({
+  querySelector() {
+    return null;
+  },
+  querySelectorAll(selector) {
+    if (selector === "a, button, span, div") {
+      return [{ innerText: "Starting a new position", textContent: "Starting a new position" }];
+    }
+    return [];
+  }
+}, "I'm happy to share that I'm starting a new position as Director, Product at InCred Financial Services!");
 
 const resolvedStructuredText = textResolver.resolve(structuredTextPost).fullText;
 const structuredResolutionCheck = {
@@ -459,6 +537,10 @@ console.log(JSON.stringify({
   vocabularyChecks,
   nativeJobCardCheck: {
     detected: nativeJobEntities.hasNativeJobCard === true
+  },
+  startingPositionCardCheck: {
+    detectedAsNewPosition: startingPositionEntities.nativeCardType === "new-position",
+    treatedAsJobCard: startingPositionEntities.hasNativeJobCard === true
   },
   failedCount: failed.length
     + failedFeedObserverChecks.length

@@ -8,6 +8,12 @@ Run this in the project folder:
 node .\scripts\run-classifier-smoke-test.js
 ```
 
+For the saved-posts feature tests, also run:
+
+```powershell
+node --test .\tests\saved-posts-storage.test.js .\tests\saved-posts-page-model.test.js .\tests\background.test.js
+```
+
 This checks a few high-signal examples for:
 
 - `Open`
@@ -32,6 +38,11 @@ Open `https://www.linkedin.com/feed/` and verify:
 - closed update posts become `Closed/Filled`
 - career-story posts become `No opening`
 - truncated uncertain posts may start as `Maybe` and later improve
+- the `Saved posts` button appears on supported LinkedIn pages
+- clicking `Saved posts` opens the extension workspace in a new tab
+- `Open` and `Maybe` posts appear in the workspace automatically
+- company and role fields can be edited and saved
+- removed rows stay gone even if you revisit the same LinkedIn post
 
 ## 4. If badges do not show
 

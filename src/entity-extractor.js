@@ -5,6 +5,7 @@
   const ROLE_PATTERNS = [
     /\b(?:role|position|opening|job)\s*:\s*([a-z][a-z0-9/&,+()' -]{1,80})/i,
     /\bhiring\s*:?\s*([a-z][a-z0-9/&,+()' -]{1,80})\s+(?:at|for)\s+([a-z][a-z0-9&.,' -]{1,80})/i,
+    /\b(?:we(?:'re| are)?\s+)?looking to hire\s+([a-z][a-z0-9/&,+()' -]{1,80}?)(?=\s+at\s+[a-z]|\s+with\b|\.|,|;|$)/i,
     /\blooking for\s+(?:an?|the)\s+([a-z][a-z0-9/&,+()' -]{1,80})/i,
     /\b(?:we(?:'re| are)? hiring|actively hiring)\s+(?:an?|for)?\s*([a-z][a-z0-9/&,+()' -]{1,80}?)(?=\.|,|;|\bat\b|\bto join\b|\bto work\b|\bremote\b|$)/i,
     /\bjoin us as\s+(?:an?|the)\s+([a-z][a-z0-9/&,+()' -]{1,80})/i
@@ -13,7 +14,9 @@
   const COMPANY_PATTERNS = [
     /\bcompany\s*:\s*([a-z][a-z0-9&.,' -]{1,80}?)(?=\.|,|;|\brole\b|\brequirements\b|$)/i,
     /\b([A-Z][A-Za-z0-9&.,' -]{1,80})\s+is hiring\b/,
-    /\bjoin us at\s+([A-Z][A-Za-z0-9&.,' -]{1,80}?)(?=\.|,|;|\bin\b\s+[A-Z][A-Za-z]+|$)/
+    /\bjoin us at\s+([A-Z][A-Za-z0-9&.,/' -]{1,80}?)(?=\.|,|;|\bin\b\s+[A-Z][A-Za-z]+|$)/,
+    /^at\s+([A-Z][A-Za-z0-9&.,/' -]{1,80}?)(?=,|\s+we\b|\s+our\b)/i,
+    /\bbusiness of\s+([A-Z][A-Za-z0-9&.,/' -]{1,80}?)(?=\s+after\b|\.|,|;|$)/i
   ];
 
   const RECRUITER_SIGNALS = [
@@ -33,6 +36,19 @@
     "co-founder",
     "cofounder",
     "ceo"
+  ];
+
+  const COMPANY_SUFFIX_PATTERNS = [
+    /\bcareers?\b$/i,
+    /\bhiring\b$/i,
+    /\bjobs?\b$/i,
+    /\s*&\s*co\.?$/i,
+    /\s+co\.?$/i
+  ];
+
+  const DISALLOWED_COMPANY_PREFIXES = [
+    /^(?:our|the|this|that|their|my)\b/i,
+    /^(?:summer|winter|spring|fall)\b/i
   ];
 
   function cleanCandidate(value) {
@@ -55,12 +71,89 @@
     return cleaned.replace(/\b\w/g, (letter) => letter.toUpperCase());
   }
 
+  function splitRoleCandidates(value) {
+    const source = String(value || "");
+    const candidates = [];
+    let current = "";
+    let depth = 0;
+
+    for (const character of source) {
+      if (character === "(") {
+        depth += 1;
+        current += character;
+        continue;
+      }
+
+      if (character === ")") {
+        depth = Math.max(0, depth - 1);
+        current += character;
+        continue;
+      }
+
+      if (depth === 0 && (character === "," || character === "|" || character === "/")) {
+        candidates.push(current);
+        current = "";
+        continue;
+      }
+
+      current += character;
+    }
+
+    if (current) {
+      candidates.push(current);
+    }
+
+    return candidates
+      .map((candidate) => normalizeRole(candidate))
+      .filter(Boolean);
+  }
+
   function normalizeCompany(value) {
-    const cleaned = cleanCandidate(value).replace(/[.,:;]+$/, "").trim();
+    let cleaned = cleanCandidate(value).replace(/[.,:;]+$/, "").trim();
+    COMPANY_SUFFIX_PATTERNS.forEach((pattern) => {
+      cleaned = cleaned.replace(pattern, "").trim();
+    });
+
     if (!cleaned || cleaned.length < 2) {
       return "";
     }
+
+    if (DISALLOWED_COMPANY_PREFIXES.some((pattern) => pattern.test(cleaned))) {
+      return "";
+    }
+
+    if (!/[A-Z]/.test(cleaned)) {
+      return "";
+    }
+
     return cleaned;
+  }
+
+  function titleCaseFromDomain(domainRoot) {
+    return String(domainRoot || "")
+      .split(/[-_.]+/)
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ");
+  }
+
+  function extractCompanyFromEmail(text) {
+    const emails = extractEmails(text);
+    for (const email of emails) {
+      const domain = String(email).split("@")[1] || "";
+      const domainRoot = domain.split(".")[0] || "";
+      if (!domainRoot || /^(gmail|yahoo|outlook|hotmail|protonmail|icloud|example)$/i.test(domainRoot)) {
+        continue;
+      }
+
+      const normalized = normalizeCompany(titleCaseFromDomain(domainRoot));
+      if (normalized) {
+        return normalized;
+      }
+    }
+
+    return "";
   }
 
   function firstMatch(text, patterns, mapper) {
@@ -103,7 +196,7 @@
       return linkedCompany;
     }
 
-    const hiringRoleMatch = text.match(/\bhiring\s*:?\s*([a-z][a-z0-9/&,+()' -]{1,80})\s+(?:at|for)\s+([a-z][a-z0-9&.,' -]{1,80}?)(?=\.|,|;|\bin\b\s+[A-Z][A-Za-z]+|$)/i);
+    const hiringRoleMatch = text.match(/\bhiring\s*:?\s*([a-z][a-z0-9/&,+()' -]{1,80})\s+(?:at|for)\s+([a-z][a-z0-9&.,/' -]{1,80}?)(?=:|\.|,|;|\bin\b\s+[A-Z][A-Za-z]+|$)/i);
     if (hiringRoleMatch) {
       return normalizeCompany(hiringRoleMatch[2]);
     }
@@ -113,12 +206,35 @@
       return explicit;
     }
 
+    const fromEmail = extractCompanyFromEmail(text);
+    if (fromEmail) {
+      return fromEmail;
+    }
+
     return "";
   }
 
-  function extractRole(text) {
-    const explicit = firstMatch(text, ROLE_PATTERNS, (match) => normalizeRole(match[1]));
-    return explicit || "";
+  function extractRoles(text) {
+    const roles = [];
+    const seen = new Set();
+
+    ROLE_PATTERNS.forEach((pattern) => {
+      const match = text.match(pattern);
+      if (!match || !match[1]) {
+        return;
+      }
+
+      splitRoleCandidates(match[1]).forEach((role) => {
+        const key = role.toLowerCase();
+        if (seen.has(key)) {
+          return;
+        }
+        seen.add(key);
+        roles.push(role);
+      });
+    });
+
+    return roles;
   }
 
   function buildSubtitle(entities) {
@@ -131,24 +247,37 @@
     return entities.authorType || "";
   }
 
-  function hasNativeJobCard(postElement) {
+  function detectNativeCardType(postElement) {
     if (!postElement || typeof postElement.querySelector !== "function") {
-      return false;
+      return "";
+    }
+
+    const visiblePostText = visibleText(postElement).toLowerCase();
+    if (visiblePostText.includes("starting a new position")) {
+      return "new-position";
     }
 
     if (postElement.querySelector("a[href*='/jobs/view/'], a[href*='/jobs/collections/'], a[href*='/talent/jobs/']")) {
-      return true;
+      return "job";
     }
 
     if (typeof postElement.querySelectorAll !== "function") {
-      return false;
+      return "";
     }
 
-    return Array.from(postElement.querySelectorAll("a, button, span"))
-      .some((node) => {
-        const label = visibleText(node).toLowerCase();
-        return label === "view job" || label === "see job details" || label === "easy apply";
-      });
+    const labels = Array.from(postElement.querySelectorAll("a, button, span, div"))
+      .map((node) => visibleText(node).toLowerCase())
+      .filter(Boolean);
+
+    if (labels.some((label) => label === "starting a new position")) {
+      return "new-position";
+    }
+
+    if (labels.some((label) => label === "view job" || label === "see job details" || label === "easy apply")) {
+      return "job";
+    }
+
+    return "";
   }
 
   NS.entityExtractor = {
@@ -157,14 +286,18 @@
       const authorName = extractAuthor(postElement);
       const authorType = inferAuthorType(postElement);
       const companyName = extractCompany(postElement, text);
-      const roleTitle = extractRole(text);
+      const roleTitles = extractRoles(text);
+      const roleTitle = roleTitles[0] || "";
+      const nativeCardType = detectNativeCardType(postElement);
 
       return {
         authorName,
         authorType,
         companyName,
+        roleTitles,
         roleTitle,
-        hasNativeJobCard: hasNativeJobCard(postElement),
+        nativeCardType,
+        hasNativeJobCard: nativeCardType === "job",
         hasApplyLink: extractUrls(text).length > 0,
         hasEmail: extractEmails(text).length > 0,
         subtitle: buildSubtitle({

@@ -1,0 +1,322 @@
+:root {
+  color-scheme: light;
+  --page-bg: #f5f6f8;
+  --panel-bg: rgba(255, 255, 255, 0.88);
+  --panel-border: rgba(15, 23, 42, 0.08);
+  --panel-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+  --text-strong: #101828;
+  --text-muted: #667085;
+  --line-soft: rgba(15, 23, 42, 0.08);
+  --accent-dark: #111827;
+  --accent-blue: #2563eb;
+  --open-bg: #eaf8ee;
+  --open-text: #166534;
+  --maybe-bg: #fff4df;
+  --maybe-text: #b45309;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 28%),
+    linear-gradient(180deg, #f8fafc 0%, var(--page-bg) 100%);
+  color: var(--text-strong);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
+}
+
+.saved-posts-app {
+  width: min(1360px, calc(100vw - 48px));
+  margin: 24px auto;
+  padding: 28px;
+  border: 1px solid var(--panel-border);
+  border-radius: 28px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(24px);
+  box-shadow: var(--panel-shadow);
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.subtitle {
+  margin: 10px 0 0;
+  max-width: 640px;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.header-meta {
+  min-width: 200px;
+  padding: 14px 16px;
+  border: 1px solid var(--line-soft);
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.96);
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+  margin-bottom: 18px;
+}
+
+.search-field,
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.search-field {
+  flex: 1 1 320px;
+}
+
+.filter-field {
+  width: 180px;
+}
+
+.toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.search-field input,
+.filter-field select {
+  height: 44px;
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 0 14px;
+  color: var(--text-strong);
+  font: 500 14px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+}
+
+.toolbar-button {
+  height: 44px;
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 0 16px;
+  color: var(--text-strong);
+  font: 600 13px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  cursor: pointer;
+}
+
+.toolbar-button.is-primary {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  color: #fff;
+}
+
+.search-field input:focus,
+.filter-field select:focus,
+.inline-input:focus {
+  outline: 2px solid rgba(37, 99, 235, 0.2);
+  border-color: rgba(37, 99, 235, 0.45);
+}
+
+.table-shell {
+  border: 1px solid var(--line-soft);
+  border-radius: 22px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.saved-posts-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.saved-posts-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line-soft);
+  background: rgba(249, 250, 251, 0.96);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.saved-posts-table tbody td {
+  padding: 16px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  font-size: 14px;
+  line-height: 1.45;
+  vertical-align: top;
+}
+
+.saved-posts-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 68px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-pill.is-open {
+  background: var(--open-bg);
+  color: var(--open-text);
+}
+
+.status-pill.is-maybe {
+  background: var(--maybe-bg);
+  color: var(--maybe-text);
+}
+
+.roles-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.roles-list li + li {
+  margin-top: 4px;
+}
+
+.link-cell a {
+  color: var(--accent-blue);
+  text-decoration: none;
+}
+
+.link-cell a:hover {
+  text-decoration: underline;
+}
+
+.actions-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.action-button {
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: white;
+  color: var(--text-strong);
+  padding: 8px 10px;
+  font: 600 12px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  cursor: pointer;
+}
+
+.action-button.is-primary {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  color: white;
+}
+
+.action-button.is-danger {
+  color: #b42318;
+}
+
+.inline-input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font: 500 13px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  resize: vertical;
+}
+
+.timestamp {
+  color: var(--text-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.empty-state {
+  padding: 60px 24px;
+  text-align: center;
+}
+
+.empty-state h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+
+.empty-state p {
+  margin: 0 auto;
+  max-width: 420px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 960px) {
+  .saved-posts-app {
+    width: min(100vw - 20px, 100%);
+    margin: 10px;
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .app-header {
+    flex-direction: column;
+  }
+
+  .header-meta {
+    width: 100%;
+    text-align: left;
+  }
+
+  .table-shell {
+    overflow-x: auto;
+  }
+
+  .saved-posts-table {
+    min-width: 980px;
+  }
+
+  .toolbar-actions {
+    margin-left: 0;
+  }
+}

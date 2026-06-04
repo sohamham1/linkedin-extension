@@ -21,8 +21,12 @@
       NONE: "No Opening"
     },
     cachePrefix: "lihpd:cache:",
+    savedPostsStorageKey: "lihpd:saved-posts",
     eventType: "linkedin-hiring:page-data",
-    debugEventType: "linkedin-hiring:debug"
+    debugEventType: "linkedin-hiring:debug",
+    messages: {
+      OPEN_SAVED_POSTS: "LIHPD_OPEN_SAVED_POSTS"
+    }
   };
 
   NS.utils = {
@@ -50,6 +54,10 @@
 
       return input
         .normalize("NFKC")
+        .replace(/[\u2018\u2019\u201B\u2032]/g, "'")
+        .replace(/[\u201C\u201D\u2033]/g, "\"")
+        .replace(/[\u2010-\u2015\u2212]/g, "-")
+        .replace(/\u2026/g, "...")
         .replace(/[\u200B-\u200D\uFEFF]/g, "")
         .replace(/\u00A0/g, " ")
         .replace(/\s+/g, " ")

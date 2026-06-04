@@ -53,6 +53,7 @@
   function clearAll() {
     document.querySelectorAll(".lihpd-badge").forEach((badge) => badge.remove());
     document.querySelectorAll(".lihpd-status").forEach((badge) => badge.remove());
+    document.querySelectorAll(".lihpd-workspace-button").forEach((button) => button.remove());
   }
 
   function renderStatus(text) {
@@ -69,6 +70,28 @@
   NS.uiOverlay = {
     clearAll,
     renderStatus,
+    renderWorkspaceButton() {
+      let button = document.querySelector(".lihpd-workspace-button");
+      if (button) {
+        return button;
+      }
+
+      button = document.createElement("button");
+      button.type = "button";
+      button.className = "lihpd-workspace-button";
+      button.setAttribute("data-lihpd-ui", "true");
+      button.textContent = "Hiring Radar";
+      button.addEventListener("click", () => {
+        if (!chrome || !chrome.runtime || !chrome.runtime.sendMessage) {
+          return;
+        }
+        chrome.runtime.sendMessage({
+          type: NS.constants.messages.OPEN_SAVED_POSTS
+        });
+      });
+      document.body.appendChild(button);
+      return button;
+    },
     render(postElement, payload) {
       const badge = ensureBadge(postElement);
       badge.className = `lihpd-badge ${stateClass(payload.label)}`;

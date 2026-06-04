@@ -179,9 +179,15 @@
 
       const result = NS.classifier.scoreText(resolved.fullText);
       const entities = NS.entityExtractor.extract(postElement, resolved.fullText);
-      const finalLabel = entities.hasNativeJobCard
-        ? NS.constants.badgeStates.OPEN
-        : result.label;
+      let finalLabel = result.label;
+      if (entities.nativeCardType === "new-position") {
+        finalLabel = NS.constants.badgeStates.NONE;
+      } else if (entities.nativeCardType === "job") {
+        finalLabel = NS.constants.badgeStates.OPEN;
+      } else if (NS.uncertainPostFallback) {
+        const fallback = NS.uncertainPostFallback.evaluate(resolved.fullText, result, entities);
+        finalLabel = fallback.promotedLabel;
+      }
       processedPosts.set(resolved.key, {
         textHash,
         label: finalLabel
@@ -198,9 +204,21 @@
         subtitle: finalLabel === NS.constants.badgeStates.OPEN || finalLabel === NS.constants.badgeStates.MAYBE
           ? entities.subtitle
           : "",
-        debugTitle: `reason=${reason}; score=${result.hiringScore}/${result.actionabilityScore}/${result.closureScore}/${result.negativeScore}; nativeJobCard=${entities.hasNativeJobCard ? "yes" : "no"}; company=${entities.companyName || "-"}; role=${entities.roleTitle || "-"}; authorType=${entities.authorType || "-"}`
+        debugTitle: `reason=${reason}; score=${result.hiringScore}/${result.actionabilityScore}/${result.closureScore}/${result.negativeScore}; tail=${result.tailHiringScore || 0}/${result.tailActionabilityScore || 0}; nativeCard=${entities.nativeCardType || "none"}; company=${entities.companyName || "-"}; role=${entities.roleTitle || "-"}; authorType=${entities.authorType || "-"}`
       });
       logEvent(debugState, "badge-rendered", finalLabel);
+
+      NS.savedPostsStorage.upsertSavedPost({
+        postId: resolved.key,
+        postUrl: resolved.postUrl,
+        status: finalLabel,
+        companyName: entities.companyName,
+        authorName: entities.authorName,
+        authorType: entities.authorType,
+        roleTitles: entities.roleTitles
+      }).catch(() => {
+        // Keep classification resilient even if local storage is temporarily unavailable.
+      });
     }
 
     function registerPost(postElement) {
@@ -220,6 +238,8 @@
         NS.uiOverlay.clearAll();
         return;
       }
+
+      NS.uiOverlay.renderWorkspaceButton();
 
       if (cooldownUntil > Date.now()) {
         NS.uiOverlay.renderStatus("LIHPD throttling briefly");
@@ -293,6 +313,7 @@
 
       if (isSupportedRoute()) {
         NS.uiOverlay.renderStatus("LIHPD: booting");
+        NS.uiOverlay.renderWorkspaceButton();
         scanPosts("boot");
       }
       startPostScanning();

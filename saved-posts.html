@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hiring Radar</title>
+    <link rel="stylesheet" href="src/saved-posts-page.css">
+  </head>
+  <body>
+    <div class="saved-posts-app" id="app">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">LinkedIn Hiring Post Detector</p>
+          <h1>Hiring Radar</h1>
+          <p class="subtitle">Every post tagged as Open or Maybe lands here so you can review, clean up, and act on it fast.</p>
+        </div>
+        <div class="header-meta" id="summary"></div>
+      </header>
+
+      <section class="toolbar" aria-label="Hiring Radar filters">
+        <label class="search-field">
+          <span>Search</span>
+          <input id="searchInput" type="search" placeholder="Search company, role, or link">
+        </label>
+
+        <label class="filter-field">
+          <span>Status</span>
+          <select id="statusFilter">
+            <option value="all">All</option>
+            <option value="Open">Open</option>
+            <option value="Maybe">Maybe</option>
+          </select>
+        </label>
+
+        <label class="filter-field">
+          <span>Age</span>
+          <select id="ageFilter">
+            <option value="all">All time</option>
+            <option value="today">Today</option>
+            <option value="this-week">This week</option>
+            <option value="older">Older</option>
+          </select>
+        </label>
+
+        <div class="toolbar-actions" aria-label="Export actions">
+          <button id="copyTableButton" class="toolbar-button" type="button">Copy table</button>
+          <button id="exportCsvButton" class="toolbar-button is-primary" type="button">Export CSV</button>
+        </div>
+      </section>
+
+      <section class="table-shell">
+        <table class="saved-posts-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Company</th>
+              <th>Role(s)</th>
+              <th>Post link</th>
+              <th>First seen</th>
+              <th>Last seen</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div class="empty-state" id="emptyState" hidden>
+          <h2>No leads in Hiring Radar yet</h2>
+          <p>As you browse LinkedIn, any post tagged Open or Maybe will show up here automatically.</p>
+        </div>
+      </section>
+    </div>
+
+    <script src="src/utils.js"></script>
+    <script src="src/saved-posts-storage.js"></script>
+    <script src="src/saved-posts-page-model.js"></script>
+    <script src="src/saved-posts-page.js"></script>
+  </body>
+  </html>

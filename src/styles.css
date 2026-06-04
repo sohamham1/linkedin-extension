@@ -173,3 +173,30 @@ html[data-lihpd-page="detail"] .lihpd-badge.has-meta {
     inset 0 1px 0 rgba(255, 255, 255, 0.7);
   pointer-events: none;
 }
+
+.lihpd-workspace-button {
+  position: fixed;
+  right: 20px;
+  bottom: 86px;
+  z-index: 2147483647;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.96), rgba(31, 41, 55, 0.92));
+  color: #f8fafc;
+  padding: 11px 16px;
+  font: 600 12px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  letter-spacing: -0.01em;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.24);
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.lihpd-workspace-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 22px 44px rgba(15, 23, 42, 0.28);
+}
+
+.lihpd-workspace-button:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.6);
+  outline-offset: 3px;
+}
