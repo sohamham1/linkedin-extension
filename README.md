@@ -12,6 +12,7 @@ If you job hunt, source talent, track hiring signals, or just do not want to rea
 - avoid wasting time on reflections, announcements, and referral posts
 - notice when a role appears to be closed
 - scan the home timeline with less friction
+- keep a small saved list of posts worth revisiting
 
 ## What it does
 
@@ -23,6 +24,8 @@ On supported LinkedIn post surfaces, the extension adds one of four labels:
 - `No Opening`: the post is probably not a real opening
 
 The extension also treats LinkedIn's own native in-post job cards as a strong signal. If LinkedIn attaches a real `View job` module to a post, that post is treated as an opening.
+
+It also includes a lightweight saved-posts workspace. Posts marked `Open` or `Maybe` can be collected automatically, reviewed in one place, edited, and removed when you are done with them.
 
 ## What counts as a benefit
 
@@ -63,6 +66,7 @@ Privacy is a core part of the product:
 - no API keys
 - no account linking
 - classification happens locally in the browser
+- saved posts are stored locally in your browser extension storage
 
 This is not a SaaS tool watching your feed from somewhere else. The logic runs on your machine.
 
@@ -84,7 +88,9 @@ This project is currently set up as an unpacked Chrome extension.
 3. Look at the pill shown on supported posts.
 4. Prioritize `Open` first.
 5. Treat `Maybe` as worth checking manually.
-6. Treat `No Opening` as likely non-actionable for hiring.
+6. Open the saved-posts workspace from the extension button when you want to review `Open` and `Maybe` posts together.
+7. Edit or remove saved rows as you work through them.
+8. Treat `No Opening` as likely non-actionable for hiring.
 
 In some cases, the pill may also show lightweight company context to make scanning faster.
 
