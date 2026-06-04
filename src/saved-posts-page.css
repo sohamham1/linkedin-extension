@@ -232,6 +232,11 @@ body {
   text-decoration: underline;
 }
 
+.missing-link {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
 .actions-cell {
   display: flex;
   flex-wrap: wrap;

@@ -155,6 +155,41 @@
       return true;
     }
 
+    function isSavedPostStatus(label) {
+      return label === NS.constants.badgeStates.OPEN || label === NS.constants.badgeStates.MAYBE;
+    }
+
+    function createSavedPostPayload(resolved, finalLabel, entities) {
+      if (!isSavedPostStatus(finalLabel)) {
+        return null;
+      }
+
+      return {
+        postId: resolved.key,
+        postUrl: resolved.postUrl,
+        status: finalLabel,
+        companyName: entities.companyName,
+        authorName: entities.authorName,
+        authorType: entities.authorType,
+        roleTitles: entities.roleTitles
+      };
+    }
+
+    function persistProcessedPost(record) {
+      if (!record || !record.savePayload || record.saveStatus === "saved" || record.saveStatus === "ignored" || record.saveStatus === "saving") {
+        return;
+      }
+
+      record.saveStatus = "saving";
+      NS.savedPostsStorage.upsertSavedPost(record.savePayload)
+        .then((savedPost) => {
+          record.saveStatus = savedPost ? "saved" : "ignored";
+        })
+        .catch(() => {
+          record.saveStatus = "pending";
+        });
+    }
+
     function classifyAndRender(postElement, reason) {
       if (stopped || !isSupportedRoute()) {
         return;
@@ -170,6 +205,7 @@
       const textHash = hashString(normalizedText);
       const previous = processedPosts.get(resolved.key);
       if (previous && previous.textHash === textHash) {
+        persistProcessedPost(previous);
         return;
       }
 
@@ -188,10 +224,13 @@
         const fallback = NS.uncertainPostFallback.evaluate(resolved.fullText, result, entities);
         finalLabel = fallback.promotedLabel;
       }
-      processedPosts.set(resolved.key, {
+      const processedRecord = {
         textHash,
-        label: finalLabel
-      });
+        label: finalLabel,
+        savePayload: createSavedPostPayload(resolved, finalLabel, entities),
+        saveStatus: isSavedPostStatus(finalLabel) ? "pending" : "not-applicable"
+      };
+      processedPosts.set(resolved.key, processedRecord);
 
       if (previous) {
         logEvent(debugState, "post-updated", finalLabel);
@@ -208,17 +247,7 @@
       });
       logEvent(debugState, "badge-rendered", finalLabel);
 
-      NS.savedPostsStorage.upsertSavedPost({
-        postId: resolved.key,
-        postUrl: resolved.postUrl,
-        status: finalLabel,
-        companyName: entities.companyName,
-        authorName: entities.authorName,
-        authorType: entities.authorType,
-        roleTitles: entities.roleTitles
-      }).catch(() => {
-        // Keep classification resilient even if local storage is temporarily unavailable.
-      });
+      persistProcessedPost(processedRecord);
     }
 
     function registerPost(postElement) {

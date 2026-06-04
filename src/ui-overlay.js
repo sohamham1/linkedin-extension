@@ -57,14 +57,7 @@
   }
 
   function renderStatus(text) {
-    let status = document.querySelector(".lihpd-status");
-    if (!status) {
-      status = document.createElement("div");
-      status.className = "lihpd-status";
-      status.setAttribute("data-lihpd-ui", "true");
-      document.body.appendChild(status);
-    }
-    status.textContent = text;
+    return null;
   }
 
   NS.uiOverlay = {

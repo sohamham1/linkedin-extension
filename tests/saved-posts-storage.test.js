@@ -218,6 +218,24 @@ test("upsertSavedPost derives a canonical LinkedIn URL from an activity postId w
   assert.equal(rows[0].postUrl, "https://www.linkedin.com/feed/update/urn:li:activity:7467921408011116545/");
 });
 
+test("upsertSavedPost keeps qualifying posts even when a permalink is not available yet", async () => {
+  const storage = loadStorageModule();
+
+  await storage.upsertSavedPost({
+    postId: "text-hash-without-link",
+    postUrl: "",
+    status: "Maybe",
+    companyName: "Acme",
+    roleTitles: ["Product Manager"]
+  });
+
+  const rows = await storage.listSavedPosts();
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].postId, "text-hash-without-link");
+  assert.equal(rows[0].postUrl, "");
+  assert.equal(rows[0].status, "Maybe");
+});
+
 test("upsertSavedPost preserves multiple concurrent qualifying saves", async () => {
   const storage = loadStorageModule(createDelayedStorageArea());
 

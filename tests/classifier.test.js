@@ -62,3 +62,11 @@ test("classifier keeps work-anniversary personal stories with apply again phrasi
 
   assert.equal(result.label, "No Opening");
 });
+
+test("classifier keeps revoked-offer self-seeking posts as no opening", () => {
+  const classifier = loadClassifier();
+
+  const result = classifier.scoreText("My FTE offer from Oracle was revoked as part of their recent mass revocation.\n\nOver the past 5 months I worked on real production systems - Kubernetes autoscaling with KEDA and Prometheus, XML automation pipelines, and CLI infrastructure tooling used across live service deployments.\n\nAbout me: NIT Patna, CSE | CGPA 9.68,\nOracle Intern - Cloud Infrastructure & DevOps,\nLeetCode Knight | Rating 1864 (Top 5.5% globally)\nStack: Java, Python, Kubernetes, Docker, Node.js, Linux\n\nActively looking for SDE-1 or DevOps/Platform Engineering roles with immediate joining.\nOpen to relocation anywhere in India.\nIf your team is hiring or you can refer me, I'd genuinely appreciate it. Resume attached.");
+
+  assert.equal(result.label, "No Opening");
+});

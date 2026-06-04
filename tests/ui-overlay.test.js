@@ -66,3 +66,54 @@ test("workspace button delegates opening to the extension runtime message bridge
   assert.equal(sentMessages.length, 1);
   assert.equal(sentMessages[0].type, "LIHPD_OPEN_SAVED_POSTS");
 });
+
+test("status toast is not rendered for end users", () => {
+  const source = fs.readFileSync(path.join(__dirname, "..", "src", "ui-overlay.js"), "utf8");
+  let appendedNode = null;
+
+  const context = {
+    console,
+    document: {
+      querySelector() {
+        return null;
+      },
+      querySelectorAll() {
+        return [];
+      },
+      body: {
+        appendChild(node) {
+          appendedNode = node;
+        }
+      },
+      createElement() {
+        return {
+          className: "",
+          setAttribute() {},
+          textContent: ""
+        };
+      }
+    },
+    LinkedInHiringExtension: {
+      constants: {
+        badgeStates: {
+          OPEN: "Open",
+          CLOSED: "Closed/Filled",
+          MAYBE: "Maybe",
+          NONE: "No Opening"
+        },
+        messages: {
+          OPEN_SAVED_POSTS: "LIHPD_OPEN_SAVED_POSTS"
+        }
+      }
+    }
+  };
+
+  context.window = context;
+  context.globalThis = context;
+  vm.createContext(context);
+  vm.runInContext(source, context, { filename: "ui-overlay.js" });
+
+  context.LinkedInHiringExtension.uiOverlay.renderStatus("LIHPD: scanning page");
+
+  assert.equal(appendedNode, null);
+});

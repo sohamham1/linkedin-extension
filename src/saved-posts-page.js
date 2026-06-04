@@ -71,6 +71,9 @@
       const companyMarkup = isEditing
         ? `<input class="inline-input" data-field="company" value="${escapeHtml(row.companyName)}">`
         : `<strong>${escapeHtml(displayCompanyName)}</strong>`;
+      const linkMarkup = row.postUrl
+        ? `<a href="${escapeHtml(row.postUrl)}" target="_blank" rel="noreferrer">View post</a>`
+        : `<span class="missing-link">Link pending</span>`;
       const actionsMarkup = isEditing
         ? `
           <button class="action-button is-primary" data-action="save" data-post-id="${escapeHtml(row.postId)}">Save</button>
@@ -86,7 +89,7 @@
           <td><span class="status-pill ${row.status === "Open" ? "is-open" : "is-maybe"}">${escapeHtml(row.status)}</span></td>
           <td>${companyMarkup}</td>
           <td>${rolesMarkup}</td>
-          <td class="link-cell"><a href="${escapeHtml(row.postUrl)}" target="_blank" rel="noreferrer">View post</a></td>
+          <td class="link-cell">${linkMarkup}</td>
           <td class="timestamp">${escapeHtml(formatDate(row.firstSeenAt))}</td>
           <td class="timestamp">${escapeHtml(formatDate(row.lastSeenAt))}</td>
           <td><div class="actions-cell">${actionsMarkup}</div></td>

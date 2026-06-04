@@ -140,9 +140,6 @@
     }
 
     const canonicalPostUrl = deriveCanonicalPostUrl(input.postId, input.postUrl);
-    if (!canonicalPostUrl) {
-      return null;
-    }
 
     return queueMutation(async () => {
       const state = await readState();

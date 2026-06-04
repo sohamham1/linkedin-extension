@@ -65,6 +65,11 @@ const fixtures = [
     text: "I got laid off last month and I'm still processing it. If you're hiring a fraud or risk specialist, I'm open and looking. Would appreciate referrals and happy to connect."
   },
   {
+    name: "Revoked offer self-seeking post",
+    expected: "No Opening",
+    text: "My FTE offer from Oracle was revoked as part of their recent mass revocation.\n\nOver the past 5 months I worked on real production systems - Kubernetes autoscaling with KEDA and Prometheus, XML automation pipelines, and CLI infrastructure tooling used across live service deployments.\n\nAbout me: NIT Patna, CSE | CGPA 9.68,\nOracle Intern - Cloud Infrastructure & DevOps,\nLeetCode Knight | Rating 1864 (Top 5.5% globally)\nStack: Java, Python, Kubernetes, Docker, Node.js, Linux\n\nActively looking for SDE-1 or DevOps/Platform Engineering roles with immediate joining.\nOpen to relocation anywhere in India.\nIf your team is hiring or you can refer me, I'd genuinely appreciate it. Resume attached."
+  },
+  {
     name: "Emergency help and referrals post",
     expected: "No Opening",
     text: "I have submitted over 10,000 applications and still need help. If anyone knows of remote jobs, freelance projects, contract work, referrals, or professional connections, please reach out. If you can support my GoFundMe, it would help."

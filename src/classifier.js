@@ -214,7 +214,9 @@
       "would appreciate referrals", "open for work", "i'm looking for my next role",
       "i am looking for my next role", "looking for my next opportunity", "seeking new opportunities",
       "remote jobs", "freelance projects", "contract work", "professional connections", "gofundme",
-      "please reach out", "i need an opportunity", "i need help", "i desperately need"
+      "please reach out", "i need an opportunity", "i need help", "i desperately need",
+      "offer was revoked", "offer got revoked", "offer revoked", "mass revocation",
+      "open to relocation", "refer me"
     ],
     personalAnnouncementSignals: [
       "i'm delighted to share", "i am delighted to share", "i'm excited to share",
@@ -316,8 +318,21 @@
   }
 
   function hasExplicitHiringAnnouncement(text) {
-    return /(^|[^a-z0-9])hiring\s*:\s+[a-z]/i.test(text)
-      || /(^|[^a-z0-9])[a-z0-9&.' -]+\s+is hiring([^a-z0-9]|$)/i.test(text);
+    if (/(^|[^a-z0-9])hiring\s*:\s+[a-z]/i.test(text)) {
+      return true;
+    }
+
+    const subjectMatch = text.match(/(^|[^a-z0-9])([a-z0-9&.' -]+)\s+is hiring([^a-z0-9]|$)/i);
+    if (!subjectMatch) {
+      return false;
+    }
+
+    const subject = normalizeText(subjectMatch[2]);
+    if (["i", "we", "you", "your team", "our team", "my team", "their team", "someone", "anyone"].includes(subject)) {
+      return false;
+    }
+
+    return true;
   }
 
   function hasStructuredRoleBlock(text) {
@@ -336,7 +351,7 @@
   }
 
   function hasInlineHiringRole(text) {
-    return /\b(?:we(?:'re| are)? hiring|hiring|we(?:'re| are)? looking to hire|looking to hire)\s+(?:an?|for)?\s*[a-z][a-z0-9/&,+()' -]{2,80}\b/i.test(text);
+    return /\b(?:we(?:'re| are)? hiring|we(?:'re| are)? looking to hire|looking to hire|hiring\s*:)\s+(?:an?|for)?\s*[a-z][a-z0-9/&,+()' -]{2,80}\b/i.test(text);
   }
 
   function hasApplyCallToAction(text) {
