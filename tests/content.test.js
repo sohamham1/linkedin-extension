@@ -130,3 +130,118 @@ test("content retries saving a qualifying post after a transient storage failure
 
   assert.equal(saveAttempts, 2);
 });
+
+test("content classifies feed posts during scans without waiting for an intersection callback", async () => {
+  const source = fs.readFileSync(path.join(__dirname, "..", "src", "content.js"), "utf8");
+  const postElement = {
+    dataset: {},
+    style: {},
+    querySelector() {
+      return null;
+    },
+    querySelectorAll() {
+      return [];
+    }
+  };
+  const renderedLabels = [];
+
+  const context = {
+    console,
+    Date,
+    URL,
+    location: new URL("https://www.linkedin.com/feed/"),
+    setInterval() {
+      return 1;
+    },
+    clearInterval() {},
+    IntersectionObserver: function IntersectionObserver() {
+      return {
+        observe() {},
+        disconnect() {}
+      };
+    },
+    document: {
+      readyState: "complete",
+      documentElement: {
+        setAttribute() {}
+      },
+      addEventListener() {}
+    },
+    window: {},
+    globalThis: {},
+    LinkedInHiringExtension: {
+      constants: {
+        badgeStates: {
+          OPEN: "Open",
+          MAYBE: "Maybe",
+          NONE: "No Opening"
+        }
+      },
+      utils: {
+        hashString(input) {
+          return `h:${String(input || "").length}`;
+        },
+        normalizeText(input) {
+          return String(input || "").replace(/\s+/g, " ").trim().toLowerCase();
+        }
+      },
+      feedObserver: {
+        findPosts() {
+          return [postElement];
+        }
+      },
+      textResolver: {
+        resolve() {
+          return {
+            key: "visible-post-without-intersection-event",
+            postUrl: "",
+            fullText: "We're hiring a Backend Engineer. Apply here.",
+            truncated: false
+          };
+        }
+      },
+      classifier: {
+        scoreText() {
+          return {
+            label: "Open",
+            hiringScore: 10,
+            actionabilityScore: 6,
+            closureScore: 0,
+            negativeScore: 0
+          };
+        }
+      },
+      entityExtractor: {
+        extract() {
+          return {
+            nativeCardType: "",
+            companyName: "Acme",
+            authorName: "Acme Careers",
+            authorType: "Company",
+            roleTitles: ["Backend Engineer"]
+          };
+        }
+      },
+      uiOverlay: {
+        clearAll() {},
+        renderStatus() {},
+        renderWorkspaceButton() {},
+        render(_postElement, payload) {
+          renderedLabels.push(payload.label);
+        }
+      },
+      savedPostsStorage: {
+        async upsertSavedPost() {
+          return { postId: "visible-post-without-intersection-event" };
+        }
+      }
+    }
+  };
+
+  context.window = context;
+  context.globalThis = context;
+  vm.createContext(context);
+  vm.runInContext(source, context, { filename: "content.js" });
+
+  assert.deepEqual(renderedLabels, ["Open"]);
+});

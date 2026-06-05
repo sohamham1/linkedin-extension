@@ -115,6 +115,8 @@
     let routePoller = null;
     let stopped = false;
     let cooldownUntil = 0;
+    let focusHandler = null;
+    let visibilityHandler = null;
 
     function disconnectAll() {
       if (intersectionObserver) {
@@ -128,6 +130,14 @@
       if (routePoller) {
         window.clearInterval(routePoller);
         routePoller = null;
+      }
+      if (focusHandler && typeof window.removeEventListener === "function") {
+        window.removeEventListener("focus", focusHandler);
+        focusHandler = null;
+      }
+      if (visibilityHandler && typeof document.removeEventListener === "function") {
+        document.removeEventListener("visibilitychange", visibilityHandler);
+        visibilityHandler = null;
       }
     }
 
@@ -281,9 +291,7 @@
         : "LIHPD: no feed posts detected yet");
       posts.forEach((postElement) => {
         registerPost(postElement);
-        if (visiblePosts.has(postElement)) {
-          classifyAndRender(postElement, reason);
-        }
+        classifyAndRender(postElement, reason);
       });
     }
 
@@ -326,6 +334,26 @@
       }, ROUTE_POLL_INTERVAL_MS);
     }
 
+    function bindLifecycleRescan() {
+      focusHandler = () => {
+        if (!stopped) {
+          scanPosts("focus");
+        }
+      };
+      visibilityHandler = () => {
+        if (!stopped && document.visibilityState === "visible") {
+          scanPosts("visible-again");
+        }
+      };
+
+      if (typeof window.addEventListener === "function") {
+        window.addEventListener("focus", focusHandler);
+      }
+      if (typeof document.addEventListener === "function") {
+        document.addEventListener("visibilitychange", visibilityHandler);
+      }
+    }
+
     function boot() {
       logEvent(debugState, "boot", location.href);
       syncPageMode(location.href);
@@ -347,6 +375,7 @@
       }
       startPostScanning();
       startRoutePolling();
+      bindLifecycleRescan();
     }
 
     return {
